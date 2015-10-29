@@ -13,9 +13,13 @@ else()
   set(CGAL_BUILD_TYPE Debug)
 endif()
 
-# CGAL doesn't allow Developer as build type.
+# CGAL doesn't allow Developer, RelWithDebInfo and MinSizeRel as build type.
 if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Developer" )
   set(CGAL_BUILD_TYPE "Debug")
+endif()
+if ( "${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel"
+     OR "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo" )
+ set(CGAL_BUILD_TYPE "Release")
 endif()
 
 message(STATUS "CGAL build type: ${CGAL_BUILD_TYPE}")
@@ -42,7 +46,7 @@ ExternalProject_Add(CGAL-4.6.3
     # -DWITH_ZLIB:BOOL=OFF         \
 
   UPDATE_COMMAND ""
-) 
+)
 
 set(CGAL_INCLUDE_DIR ${CGAL_INSTALL_DIR}/include PARENT_SCOPE)
 set(CGAL_LIB_DIR ${CGAL_INSTALL_DIR}/lib PARENT_SCOPE)
