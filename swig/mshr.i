@@ -120,6 +120,41 @@
 
 %ignore mshr::get_boundary_mesh;
 
+%typemap (in) std::vector<std::array<double, 3>>&
+    (std::vector<std::array<double, 3>> tmp)
+{
+  if (!PyArray_Check($input))
+  {
+    SWIG_exception(SWIG_TypeError, "numpy array expected.");
+  }
+
+  PyArrayObject* array = reinterpret_cast<PyArrayObject*>($input);
+
+  if (PyArray_TYPE(array) != NPY_DOUBLE)
+  {
+    SWIG_exception(SWIG_TypeError, "numpy array of doubles expected.");
+  }
+
+  npy_intp* shape = PyArray_DIMS(array);
+  tmp.resize(shape[0]);
+  double* in_data = static_cast<double*>(PyArray_DATA(array));
+  const std::size_t size = PyArray_SIZE(array);
+  double* out_data = reinterpret_cast<double*>(&tmp[0]);
+  if (PyArray_ISCONTIGUOUS(array))
+  {
+    std::copy_n(in_data, shape[0]*shape[1], out_data);
+  }
+  else
+  {
+    const npy_intp strides = PyArray_STRIDE(array, 0)/sizeof(double);
+    for (std::size_t i = 0; i < size; i++)
+      out_data[i] = in_data[i*strides];
+  }
+
+  $1 = &tmp;
+}
+
+
 %include <mshr/CSGGeometry.h>
 %include <mshr/CSGPrimitive.h>
 %include <mshr/CSGOperators.h>
@@ -186,5 +221,7 @@
     
     return reinterpret_cast<PyObject*>(array);
   }
+
+  // PyObject* convex_hull
 }
 
