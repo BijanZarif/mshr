@@ -42,6 +42,13 @@ add_test("Python-CSGOperators" "python" "${CMAKE_SOURCE_DIR}/test/test-csg.py")
 set_property(TEST "Python-CSGOperators" PROPERTY
     ENVIRONMENT "PYTHONPATH=${PYTHON_ENVIR}"
 )
+  
+############# Test the mesh generation ########################################################
+add_test("Python-MeshGeneration" "python" "${CMAKE_SOURCE_DIR}/test/test-mesh-generation.py")
+set_property(TEST "Python-MeshGeneration" PROPERTY
+    ENVIRONMENT "PYTHONPATH=${PYTHON_ENVIR}"
+)
+
 
 
 
