@@ -430,7 +430,10 @@ static inline void add_simple_polygon(std::map<Point_2, std::size_t>& vertices,
 
   std::size_t offset = 0;
   while (p.edge(offset).squared_length() < truncate_tolerance)
+  {
     offset++;
+    dolfin_assert(offset < p.size());
+  }
 
   Point_2 prev = p.vertex(offset);
   offset++;

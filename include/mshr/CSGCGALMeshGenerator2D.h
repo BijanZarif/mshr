@@ -60,9 +60,7 @@ namespace mshr
       p.add("pixel_size", 1e-16);
 
       // shorter edges in the domain will be collapsed before meshing
-      // if set to negative, the tolerance will be computed based on
-      // the requested cell size.
-      p.add("edge_truncate_tolerance", -1.0);
+      p.add("edge_truncate_tolerance", 1e-16);
 
       return p;
     }

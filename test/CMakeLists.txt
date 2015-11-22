@@ -42,6 +42,13 @@ add_test("Python-CSGOperators" "python" "${CMAKE_SOURCE_DIR}/test/test-csg.py")
 set_property(TEST "Python-CSGOperators" PROPERTY
     ENVIRONMENT "PYTHONPATH=${PYTHON_ENVIR}"
 )
+  
+############# Test the mesh generation ########################################################
+add_test("Python-MeshGeneration" "python" "${CMAKE_SOURCE_DIR}/test/test-mesh-generation.py")
+set_property(TEST "Python-MeshGeneration" PROPERTY
+    ENVIRONMENT "PYTHONPATH=${PYTHON_ENVIR}"
+)
+
 
 
 
@@ -50,7 +57,8 @@ set_property(TEST "Python-CSGOperators" PROPERTY
 set(CGAL_DATA_DIR "${CMAKE_SOURCE_DIR}/3rdparty/CGAL-4.6.3/demo/Polyhedron/data")
 
 # Files that should pass
-set(TESTFILES_VALID "anchor.off;couplingdown.off;cross.off;cube.off;dragknob.off;elephant.off;ellipsoid.off;handle.off;icosahedron.off;joint.off;knot1.off;knot2.off;pinion.off;pipe.off;rotor.off;sphere.off;spool.off;star.off;translated-cube.off;tripod.off")
+# Note elephant.off is valid a should passes but takes a very long (so test slave may time out)
+set(TESTFILES_VALID "anchor.off;couplingdown.off;cross.off;cube.off;dragknob.off;ellipsoid.off;handle.off;icosahedron.off;joint.off;knot1.off;knot2.off;pinion.off;pipe.off;rotor.off;sphere.off;spool.off;star.off;translated-cube.off;tripod.off")
 set(TESTFILES_SELFINTERSECTING "bones.off;cow.off;man.off;oblong.ogg")
 set(TESTFILES_NOTCLOSED "cube-ouvert.off;mushroom.off")
 set(TESTFILES_NOTTRIANGULAR "pyramid.off")
