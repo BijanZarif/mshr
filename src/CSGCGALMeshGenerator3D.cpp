@@ -295,8 +295,8 @@ void CSGCGALMeshGenerator3D::generate(std::shared_ptr<const CSGCGALDomain3D> csg
     {
       log(dolfin::TRACE, "Detecting sharp features");
 
-      //const int feature_threshold = parameters["feature_threshold"];
-      domain.detect_features();
+      const double feature_threshold = parameters["feature_threshold"];
+      domain.detect_features(feature_threshold);
     }
 
     // Mesh generation
