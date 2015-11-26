@@ -163,8 +163,10 @@ class CSGCGALDomain3D : public CSGPrimitive3D
   std::shared_ptr<CSGCGALDomain3D> reconstruct_surface() const;
 
   /// @brief Return convex hull of vertices as CSGCGALDomain3D object. Experimental
+  std::shared_ptr<CSGCGALDomain3D> convex_hull() const;
+
   static std::shared_ptr<CSGCGALDomain3D>
-    convex_hull(const CSGCGALDomain3D& c);
+    convex_hull(const std::vector<std::array<double, 3>>& point_set);
 
   // FIXME: Make this private again
   // private :

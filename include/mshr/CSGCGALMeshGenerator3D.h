@@ -66,6 +66,7 @@ namespace mshr
       p.add("cell_radius_edge_ratio", 3.0);
       p.add("cell_size", 0.05);
       p.add("detect_sharp_features", true);
+      p.add("feature_threshold", 120.);
 
       return p;
     }

@@ -1809,10 +1809,25 @@ namespace
       return ss.str();
     }
 //-----------------------------------------------------------------------------
-    std::shared_ptr<CSGCGALDomain3D> CSGCGALDomain3D::convex_hull(const CSGCGALDomain3D& c)
+    std::shared_ptr<CSGCGALDomain3D> CSGCGALDomain3D::convex_hull() const
     {
       std::shared_ptr<CSGCGALDomain3D> res(new CSGCGALDomain3D);
-      CGAL::convex_hull_3(c.impl->p.points_begin(), c.impl->p.points_end(), res->impl->p);
+      CGAL::convex_hull_3(impl->p.points_begin(), impl->p.points_end(), res->impl->p);
+
+      return res;
+    }
+  //-----------------------------------------------------------------------------
+    std::shared_ptr<CSGCGALDomain3D> CSGCGALDomain3D::convex_hull(const std::vector<std::array<double, 3>>& point_set)
+    {
+      std::vector<Exact_Point_3> points;
+      points.reserve(point_set.size());
+      for (const std::array<double,3>& p : point_set)
+        points.push_back(Exact_Point_3(p[0], p[1], p[2]));
+
+      std::shared_ptr<CSGCGALDomain3D> res(new CSGCGALDomain3D);
+      CGAL::convex_hull_3(points.begin(),
+                          points.end(),
+                          res->impl->p);
 
       return res;
     }
