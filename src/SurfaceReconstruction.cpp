@@ -58,13 +58,12 @@ namespace
 {
 
 template <class Vertex_handle>
-int get_vertex_index(std::vector<std::array<double, 3>>& vertices,
-                     Vertex_handle vh,
-                     std::map<Vertex_handle,
-                     int>& V,
-                     int& inum)
+std::size_t get_vertex_index(std::vector<std::array<double, 3>>& vertices,
+                             Vertex_handle vh,
+                             std::map<Vertex_handle, std::size_t>& V,
+                             std::size_t& inum)
 {
-  typedef typename std::map<Vertex_handle, int>::iterator map_iterator;
+  typedef typename std::map<Vertex_handle, std::size_t>::iterator map_iterator;
   std::pair<map_iterator,bool> insert_res = V.insert( std::make_pair(vh,inum) );
   if ( insert_res.second )
   {
@@ -154,17 +153,17 @@ void export_triangulation(const C2t3& c2t3,
   bool regular_orientation = (Z * normal >= 0);
 
   // used to set indices of vertices
-  std::map<Vertex_handle, int> V;
-  int inum = 0;
+  std::map<Vertex_handle, std::size_t> V;
+  std::size_t inum = 0;
 
   for(typename std::set<Facet>::const_iterator fit =
         oriented_set.begin();
       fit != oriented_set.end();
       ++fit)
   {
-    int indices[3];
-    int index = 0;
-    for (int i=0; i<3; i++)
+    std::size_t indices[3];
+    std::size_t index = 0;
+    for (std::size_t i = 0; i<3; i++)
     {
       indices[index++] = get_vertex_index(vertices,
                                           fit->first->vertex(tr.vertex_triple_index(fit->second, i)),
@@ -173,8 +172,8 @@ void export_triangulation(const C2t3& c2t3,
     }
 
     facets.push_back({ indices[0],
-          regular_orientation ? indices[1] : indices[2],
-          regular_orientation ? indices[2] : indices[1] });
+                       regular_orientation ? indices[1] : indices[2],
+                       regular_orientation ? indices[2] : indices[1] });
   }
 }
 }
