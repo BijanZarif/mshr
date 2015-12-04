@@ -49,6 +49,12 @@ set_property(TEST "Python-MeshGeneration" PROPERTY
     ENVIRONMENT "PYTHONPATH=${PYTHON_ENVIR}"
 )
 
+############# Test the predefined meshes ##########################################################
+add_test("Python-Meshes" "python" "${CMAKE_SOURCE_DIR}/test/test-meshes.py")
+set_property(TEST "Python-Meshes" PROPERTY
+    ENVIRONMENT "PYTHONPATH=${PYTHON_ENVIR}"
+)
+
 
 
 
