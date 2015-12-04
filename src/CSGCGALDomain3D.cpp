@@ -774,7 +774,6 @@ namespace
 
     void operator()(typename Polyhedron::HalfedgeDS& hds)
     {
-      std::cout << "Copying polyhedron" << std::endl;
       typedef typename Polyhedron::HalfedgeDS HDS;
 
       CGAL::Polyhedron_incremental_builder_3<HDS> builder(hds);
@@ -814,7 +813,6 @@ namespace
         builder.end_facet();
       }
       builder.end_surface();
-      std::cout << "Done copying" << std::endl;
     } // end operator()(..)
   private:
     const Polyhedron& _in_poly;
