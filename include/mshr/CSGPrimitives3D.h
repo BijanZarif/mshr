@@ -210,6 +210,9 @@ namespace mshr
     /// @brief Flip all facets
     bool flip_facets;
 
+    /// Dump read triangles and edges to off file (usefull for debugging)
+    std::string debug_dump;
+
     std::size_t cell_domain;
     bool use_cell_domain;
   };

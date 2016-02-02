@@ -159,5 +159,30 @@ void OFFFileReader::read(const std::string filename,
     get_next_line(file, line, lineno);
   }
 }
+//-----------------------------------------------------------------------------
+void OFFFileReader::write(const std::string filename,
+                          const std::vector<std::array<double, 3> >& vertices,
+                          const std::vector<std::array<std::size_t, 3> >& facets)
+{
+  std::ofstream file(filename);
+  file.precision(6);
 
+  if (!file.is_open())
+  {
+    dolfin::dolfin_error("OFFFileReader.cpp",
+                         "open file to write off data",
+                         "Failed to open file");
+  }
+
+  file << "OFF " << vertices.size() << " " << facets.size() << " 0" << std::endl << std::endl;
+  for (const std::array<double, 3>& v : vertices)
+  {
+    file << v[0] << " " << v[1] << " " << v[2] << std::endl;
+  }
+
+  for (const std::array<std::size_t, 3>& f : facets)
+  {
+    file << "3 " << f[0] << " " << f[1] << " " << f[2] << std::endl;
+  }
+}
 }

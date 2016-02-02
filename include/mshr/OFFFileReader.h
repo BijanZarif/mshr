@@ -36,6 +36,11 @@ class OFFFileReader
   static void read(const std::string filename, 
                    std::vector<std::array<double, 3> >& vertices,
                    std::vector<std::array<std::size_t, 3> >& facets);
+
+  static void write(const std::string filename,
+                    const std::vector<std::array<double, 3> >& vertices,
+                    const std::vector<std::array<std::size_t, 3> >& facets);
+
 };
 
 }

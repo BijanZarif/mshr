@@ -639,6 +639,14 @@ namespace
         log(dolfin::TRACE, "Done reading file");
       }
 
+      if (s->debug_dump != "")
+      {
+        log(dolfin::TRACE, "Dumping to file '%s'", s->debug_dump.c_str());
+        mshr::OFFFileReader::write(s->debug_dump,
+                                   vertices,
+                                   facets);
+      }
+
       if (s->flip_facets)
       {
         log(dolfin::TRACE, "Flipping facets");
