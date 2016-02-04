@@ -19,7 +19,6 @@
 #ifndef POLYHEDRAL_MULTICOMPONENT_MESH_DOMAIN_WITH_FEATURES_3_H
 #define POLYHEDRAL_MULTICOMPONENT_MESH_DOMAIN_WITH_FEATURES_3_H
 
-#include "Point3FuzzyStrictlyLess.h"
 #include "Polyhedron_utils.h"
 #include <CGAL/Polyhedral_mesh_domain_with_features_3.h>
 
@@ -113,14 +112,15 @@ Construct_initial_points::operator()(OutputIterator pts, const int n) const
 
   // Collect inserted points in a set with a fuzzy comparison operator
   // to ensure no points closer than the tolerance are inserted.
-  typedef Point3FuzzyStrictlyLess<Point_3> CompareFunctor;
-  typedef std::set<Point_3, CompareFunctor>  FuzzyPointSet;
+  // TODO: Use FuzzyPointLocator
+  // typedef Point3FuzzyStrictlyLess<Point_3> CompareFunctor;
+  typedef std::set<Point_3>  FuzzyPointSet;
   std::set<Vertex_const_handle> visited;
 
   //const CompareFunctor cf(edge_size);
   // TODO: Tune this parameter
   const double tolerance = edge_size*3;
-  FuzzyPointSet inserted_points(CompareFunctor(tolerance*tolerance));
+  FuzzyPointSet inserted_points;
 
   std::size_t current_index;
   {

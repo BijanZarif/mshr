@@ -17,7 +17,7 @@
 //
 
 #include <mshr/STLFileReader.h>
-#include "Point3FuzzyStrictlyLess.h"
+#include "FuzzyPointLocator.h"
 
 #include <dolfin/geometry/Point.h>
 #include <dolfin/common/constants.h>
@@ -114,7 +114,7 @@ void STLFileReader::read(const std::string filename,
 
   dolfin::log(dolfin:: TRACE, "Reading surface from %s ", filename.c_str());
 
-  vertices.clear();
+  // vertices.clear();
   facets.clear();
 
   typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
@@ -127,8 +127,8 @@ void STLFileReader::read(const std::string filename,
                          "Failed to open file");
   }
 
-  std::map<std::array<double, 3>, std::size_t, Point3FuzzyStrictlyLess<std::array<double, 3> > > vertex_map;
-  // std::map<std::array<double, 3>, std::size_t> vertex_map;
+  FuzzyPointMap vertex_map(1e-10);
+
   std::string line;
   std::size_t lineno = 0;
   const boost::char_separator<char> sep(" ");
@@ -239,16 +239,9 @@ void STLFileReader::read(const std::string filename,
 
       const std::array<double, 3> vertex = {{x, y, z}};
 
-      // TODO: Use std::map::find()
-      // (to avoid two queries)
-      if (vertex_map.count(vertex) > 0)
-        v_indices[counter] = vertex_map[vertex];
-      else
-      {
-        vertex_map[vertex] = vertices.size();
-        v_indices[counter] = vertices.size();
-        vertices.push_back(vertex);
-      }
+      // Insert point and get index. vertex_map takes care of merging close
+      // vertices
+      v_indices[counter] = vertex_map.insert_point(vertex);
 
       // Get next line
       get_next_line(file, line, lineno);
@@ -282,9 +275,9 @@ void STLFileReader::read(const std::string filename,
     if (has_normal)
     {
       // Compute normal
-      const dolfin::Point v1(3, vertices[v_indices[0]].data());
-      const dolfin::Point v2(3, vertices[v_indices[1]].data());
-      const dolfin::Point v3(3, vertices[v_indices[2]].data());
+      const dolfin::Point v1(3, vertex_map[v_indices[0]].data());
+      const dolfin::Point v2(3, vertex_map[v_indices[1]].data());
+      const dolfin::Point v3(3, vertex_map[v_indices[2]].data());
 
       const dolfin::Point a = v2-v1;
       const dolfin::Point b = v3-v1;
@@ -316,6 +309,8 @@ void STLFileReader::read(const std::string filename,
                          "Expected keyword endsolid at line %u", lineno);
   }
   ++tok_iter;
+
+  vertices = vertex_map.get_points();
 
   // TODO: Check name of solid
   dolfin::log(dolfin::TRACE, "Done reading surface");

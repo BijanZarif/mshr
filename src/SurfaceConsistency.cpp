@@ -18,7 +18,7 @@
 // OBS! Experimental code
 
 #include <mshr/SurfaceConsistency.h>
-#include "Point3FuzzyStrictlyLess.h"
+//#include "Point3FuzzyStrictlyLess.h"
 
 #include <dolfin/log/log.h>
 #include <vector>
@@ -204,7 +204,8 @@ std::pair<std::unique_ptr<std::vector<std::array<double, 3> > >,
 SurfaceConsistency::merge_close_vertices(const std::vector<std::array<std::size_t, 3> >& facets,
                                          const std::vector<std::array<double, 3> >& vertices)
 {
-  std::map<std::array<double, 3>, std::size_t, Point3FuzzyStrictlyLess<std::array<double, 3> > > point_map;
+  // TODO: Use FuzzyPointLocator
+  std::map<std::array<double, 3>, std::size_t> point_map;
   std::vector<std::size_t> vertex_mapping;
   vertex_mapping.reserve(vertices.size());
 
