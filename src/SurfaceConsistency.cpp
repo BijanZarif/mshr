@@ -1,4 +1,4 @@
-// Copyright (C) 2014 Benjamin Kehlet
+// Copyright (C) 2014-2016 Benjamin Kehlet
 //
 // This file is part of mshr.
 //
@@ -18,7 +18,7 @@
 // OBS! Experimental code
 
 #include <mshr/SurfaceConsistency.h>
-//#include "Point3FuzzyStrictlyLess.h"
+#include "FuzzyPointLocator.h"
 
 #include <dolfin/log/log.h>
 #include <vector>
@@ -202,10 +202,10 @@ void SurfaceConsistency::filterFacets(const std::vector<std::array<std::size_t, 
 std::pair<std::unique_ptr<std::vector<std::array<double, 3> > >,
           std::unique_ptr<std::vector<std::array<std::size_t, 3> > > >
 SurfaceConsistency::merge_close_vertices(const std::vector<std::array<std::size_t, 3> >& facets,
-                                         const std::vector<std::array<double, 3> >& vertices)
+                                         const std::vector<std::array<double, 3> >& vertices,
+                                         double tolerance)
 {
-  // TODO: Use FuzzyPointLocator
-  std::map<std::array<double, 3>, std::size_t> point_map;
+  FuzzyPointMap point_map(tolerance);
   std::vector<std::size_t> vertex_mapping;
   vertex_mapping.reserve(vertices.size());
 
@@ -213,22 +213,18 @@ SurfaceConsistency::merge_close_vertices(const std::vector<std::array<std::size_
   for (std::size_t i = 0; i < vertices.size(); i++)
   {
     const std::array<double, 3>& v = vertices[i];
-    if (point_map.count(v) > 0)
-    {
-      vertex_mapping.push_back(point_map[v]);
-      // std::cout << "Close vertices: (" << v[0] << ", " << v[1] << ", " << v[2] << ") (" << vertices[point_map[v]][0] << ", " << vertices[point_map[v]][1] << ", " << vertices[point_map[v]][2] << ")" << std::endl;
-    }
-    else
-    {
-      vertex_mapping.push_back(i);
-      point_map[vertices[i]] = i;
-    }
+    const std::size_t new_index = point_map.insert_point(v);
+    vertex_mapping.push_back(new_index);
   }
 
   // std::cout << "Distinct vertices: " << point_map.size() << std::endl;
 
-  std::unique_ptr<std::vector<std::array<double, 3> > > new_vertices(new std::vector<std::array<double, 3> >);
+  std::unique_ptr<std::vector<std::array<double, 3> > > new_vertices(new std::vector<std::array<double, 3> >(point_map.get_points()));
   std::unique_ptr<std::vector<std::array<std::size_t, 3> > > new_facets(new std::vector<std::array<std::size_t, 3> >);
+  for (const std::array<std::size_t, 3>& t : facets)
+  {
+    new_facets->push_back(std::array<std::size_t, 3>{vertex_mapping[t[0]], vertex_mapping[t[1]], vertex_mapping[t[2]]});
+  }
 
   return std::make_pair(std::move(new_vertices), std::move(new_facets));
 }
