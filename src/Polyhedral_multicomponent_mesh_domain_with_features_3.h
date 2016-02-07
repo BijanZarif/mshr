@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // mshr is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with mshr.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -19,6 +19,7 @@
 #ifndef POLYHEDRAL_MULTICOMPONENT_MESH_DOMAIN_WITH_FEATURES_3_H
 #define POLYHEDRAL_MULTICOMPONENT_MESH_DOMAIN_WITH_FEATURES_3_H
 
+#include "FuzzyPointLocator.h"
 #include "Polyhedron_utils.h"
 #include <CGAL/Polyhedral_mesh_domain_with_features_3.h>
 
@@ -81,7 +82,7 @@ template<typename Set, typename Polyhedron>
   }
 
   // Add point to set.
-  set.insert(v->point());
+  set.insert_point(v->point());
 
   typename Polyhedron::Halfedge_around_vertex_const_circulator start = v->vertex_begin(), current = start;
   do
@@ -112,15 +113,11 @@ Construct_initial_points::operator()(OutputIterator pts, const int n) const
 
   // Collect inserted points in a set with a fuzzy comparison operator
   // to ensure no points closer than the tolerance are inserted.
-  // TODO: Use FuzzyPointLocator
-  // typedef Point3FuzzyStrictlyLess<Point_3> CompareFunctor;
-  typedef std::set<Point_3>  FuzzyPointSet;
   std::set<Vertex_const_handle> visited;
 
-  //const CompareFunctor cf(edge_size);
   // TODO: Tune this parameter
   const double tolerance = edge_size*3;
-  FuzzyPointSet inserted_points;
+  FuzzyPointMap inserted_points(tolerance);
 
   std::size_t current_index;
   {
@@ -129,24 +126,27 @@ Construct_initial_points::operator()(OutputIterator pts, const int n) const
     r_domain_.get_corners(std::back_inserter(corners));
     current_index = corners.size();
     current_index++;
+    // for (const std::pair<int, Point_3>& c : corners)
     for (typename std::vector<std::pair<int, Point_3> >::iterator it = corners.begin();
          it != corners.end(); it++)
     {
-      inserted_points.insert(it->second);
+      inserted_points.forced_insert_point(it->second);
     }
   }
 
-  // Insert n suraface points from each disconnected component
+  // Insert n surface points from each disconnected component
   for (typename std::list<Vertex_const_handle>::iterator it = components.begin();
        it != components.end(); it++)
   {
     Vertex_const_handle current = *it;
-    recursive_insert<FuzzyPointSet, Polyhedron>(inserted_points, visited, current, n+inserted_points.size());
+    recursive_insert<FuzzyPointMap, Polyhedron>(inserted_points, visited, current, n+inserted_points.size());
   }
 
-  for (auto it = inserted_points.begin(); it != inserted_points.end(); it++)
+  // for (auto it = inserted_points.begin(); it != inserted_points.end(); it++)
+  for (const std::array<double, 3>& p : inserted_points.get_points())
   {
-    *pts = std::make_pair(*it, current_index);
+
+    *pts = std::make_pair(Point_3(p[0], p[1], p[2]), current_index);
     pts++;
     current_index++;
   }

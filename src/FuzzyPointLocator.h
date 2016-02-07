@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with mshr.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef FUZZY_POINT_SET_H
+#define FUZZY_POINT_SET_H
 
 #include <utility> // defines less operator for std::pair
 #include <map>
@@ -33,6 +35,63 @@ class FuzzyPointMap
   template <typename Point>
   std::size_t insert_point(const Point& p)
   //-----------------------------------------------------------------------------
+  {
+    const std::size_t index = get_index(p);
+    if (index == points.size())
+    {
+      // insert the points
+      points.push_back(std::array<double, 3>{p[0], p[1], p[2]});
+      maps[0].insert(std::make_pair(p[0], index));
+      maps[1].insert(std::make_pair(p[1], index));
+      maps[2].insert(std::make_pair(p[2], index));
+    }
+
+    return index;
+  }
+  //-----------------------------------------------------------------------------
+  template <typename Point>
+  std::size_t forced_insert_point(const Point& p)
+  //-----------------------------------------------------------------------------
+  {
+    const std::size_t index = points.size();
+
+    points.push_back(std::array<double, 3>{p[0], p[1], p[2]});
+    maps[0].insert(std::make_pair(p[0], index));
+    maps[1].insert(std::make_pair(p[1], index));
+    maps[2].insert(std::make_pair(p[2], index));
+
+    return index;
+  }
+  //-----------------------------------------------------------------------------
+  template<typename Point>
+  bool contains(const Point& p)
+  //-----------------------------------------------------------------------------
+  {
+    const std::size_t index = get_index(p);
+    return index < points.size();
+  }
+  //-----------------------------------------------------------------------------
+  const std::array<double, 3>& operator[](std::size_t i) const
+  //-----------------------------------------------------------------------------
+  {
+    return points[i];
+  }
+  //-----------------------------------------------------------------------------
+  const std::vector<std::array<double, 3>>& get_points() const
+  //-----------------------------------------------------------------------------
+  {
+    return points;
+  }
+  //-----------------------------------------------------------------------------
+  std::size_t size() const
+  //-----------------------------------------------------------------------------
+  {
+    return points.size();
+  }
+
+private:
+  template<typename Point>
+  std::size_t get_index(const Point& p)
   {
     typedef std::multimap<double, std::size_t>::iterator iterator;
 
@@ -71,34 +130,15 @@ class FuzzyPointMap
 
     // Found (at least one) close point. Return index.
     if (results[0].size() > 0)
-    {
       return *results[0].begin();
-    }
     else
-    {
       // No close point found. Insert new
-      const std::size_t new_index = points.size();
-      points.push_back(std::array<double, 3>{p[0], p[1], p[2]});
-      maps[0].insert(std::make_pair(p[0], new_index));
-      maps[1].insert(std::make_pair(p[1], new_index));
-      maps[2].insert(std::make_pair(p[2], new_index));
-
-      return new_index;
-    }
-  }
-  //-----------------------------------------------------------------------------
-  const std::array<double, 3>& operator[](std::size_t i) const
-  {
-    return points[i];
-  }
-  //-----------------------------------------------------------------------------
-  const std::vector<std::array<double, 3>>& get_points() const
-  {
-    return points;
+      return points.size();
   }
 
-private:
   const double tolerance;
   std::array<std::multimap<double, std::size_t>, 3> maps;
   std::vector<std::array<double, 3>> points;
 };
+
+#endif
