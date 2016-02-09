@@ -51,56 +51,14 @@ inline double strToDouble(const std::string& s)
 // get next line of file and trim away whitespace
 inline void get_next_line(std::ifstream& file, std::string& line, std::size_t &lineno)
 {
-  std::getline(file, line);
-  boost::algorithm::trim(line);
-  lineno++;
-}
-
-
-/*
-  inline double closest_vertices(const std::map<std::array<double, 3>,std::size_t>& vertices)
+  // Skip white
+  do
   {
-    std::cout << "Computing closest vertices (map)" << std::endl;
-    double min_distance = std::numeric_limits<double>::max();
-    std::array<double, 3> a;
-    std::array<double, 3> b;
-    std::size_t counter = 0;
-    for (auto v1 = vertices.begin(); v1 != vertices.end(); v1++)
-    {
-      if (counter % 1000 == 0)
-        std::cout << counter << std::endl;
-
-      auto v2 = v1;
-      v2++;
-      std::size_t counter2 = 0;
-      for (;v2 != vertices.end(); v2++)
-      {
-        const double d = std::pow( v1->first[0] - v2->first[0], 2 ) + std::pow( v1->first[1]- v2->first[1], 2)
-          + std::pow( v1->first[2]- v2->first[2], 2);
-        if (d < min_distance)
-        {
-          min_distance = d;
-          a = v1->first;
-          b = v2->first;
-
-        }
-        min_distance = std::min(min_distance, d);
-
-        counter2++;
-      }
-
-      counter++;
-    }
-
-    std::cout << std::scientific << "Min distance: " << min_distance << std::endl;
-    std::cout << "Equal: " << (a == b ? "True" : "False") << std::endl;
-    int tmp;
-    std::cin >> tmp;
-
-    return min_distance;
+    std::getline(file, line);
+    boost::algorithm::trim(line);
+    lineno++;
+  } while (file.good() && line.size() == 0);
 }
-*/
-
 
 } // end anonymous namespace
 //-----------------------------------------------------------------------------
