@@ -31,6 +31,7 @@
 #include "meshclean.h"
 #include "triangulation_refinement.h"
 #include "Polyhedron_utils.h"
+#include "smoothing.h"
 
 #include <dolfin/geometry/Point.h>
 #include <dolfin/math/basic.h>
@@ -40,13 +41,13 @@
 #include <dolfin/mesh/Vertex.h>
 #include <dolfin/mesh/Cell.h>
 
-#include <CGAL/basic.h>
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Exact_rational.h>
+#include <CGAL/Cartesian.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #ifndef MSHR_ENABLE_EXPERIMENTAL
-#include <CGAL/Nef_polyhedron_3.h>
+  #include <CGAL/Nef_polyhedron_3.h>
 #else
-#include <CGAL/corefinement_operations.h>
+  #include <CGAL/corefinement_operations.h>
 #endif
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/Origin.h>
@@ -74,21 +75,21 @@
 namespace
 {
 
-// Exact polyhedron
-  typedef CGAL::Exact_predicates_exact_constructions_kernel Exact_Kernel;
-  typedef Exact_Kernel::Triangle_3                          Exact_Triangle_3;
-  typedef Exact_Kernel::Triangle_2                          Exact_Triangle_2;
-  typedef Exact_Kernel::Vector_3                            Exact_Vector_3;
-  typedef CGAL::Polyhedron_3<Exact_Kernel>                  Exact_Polyhedron_3;
-  typedef Exact_Polyhedron_3::HalfedgeDS                    Exact_HalfedgeDS;
-  typedef Exact_Kernel::Point_3                             Exact_Point_3;
-  typedef Exact_Kernel::Point_2                             Exact_Point_2;
-  typedef Exact_Kernel::Vector_3                            Vector_3;
-  typedef Exact_Kernel::Ray_3                               Ray_3;
-  typedef Exact_Kernel::Aff_transformation_3                Aff_transformation_3;
+
+  typedef CGAL::Cartesian<CGAL::Exact_rational>  Exact_Kernel;
+  typedef Exact_Kernel::Triangle_3               Exact_Triangle_3;
+  typedef Exact_Kernel::Triangle_2               Exact_Triangle_2;
+  typedef Exact_Kernel::Vector_3                 Exact_Vector_3;
+  typedef CGAL::Polyhedron_3<Exact_Kernel>       Exact_Polyhedron_3;
+  typedef Exact_Polyhedron_3::HalfedgeDS         Exact_HalfedgeDS;
+  typedef Exact_Kernel::Point_3                  Exact_Point_3;
+  typedef Exact_Kernel::Point_2                  Exact_Point_2;
+  typedef Exact_Kernel::Vector_3                 Vector_3;
+  typedef Exact_Kernel::Ray_3                    Ray_3;
+  typedef Exact_Kernel::Aff_transformation_3     Aff_transformation_3;
 
 #ifndef MSHR_ENABLE_EXPERIMENTAL
-  typedef CGAL::Nef_polyhedron_3<Exact_Kernel>              Nef_polyhedron_3;
+  typedef CGAL::Nef_polyhedron_3<Exact_Kernel>   Nef_polyhedron_3;
 #endif
 
 // AABB tree primitives
@@ -1506,10 +1507,10 @@ namespace
     double CSGCGALDomain3D::volume() const
     {
       double volume = .0;
-      for (Exact_Polyhedron_3::Facet_iterator it = impl->p.facets_begin();
+      for (Exact_Polyhedron_3::Facet_const_iterator it = impl->p.facets_begin();
            it != impl->p.facets_end(); it++)
       {
-        const Exact_Polyhedron_3::Halfedge_handle h = it->halfedge();
+        const Exact_Polyhedron_3::Halfedge_const_handle h = it->halfedge();
         const Vector_3 V0 = h->vertex()->point()-CGAL::ORIGIN;
         const Vector_3 V1 = h->next()->vertex()->point()-CGAL::ORIGIN;
         const Vector_3 V2 = h->next()->next()->vertex()->point()-CGAL::ORIGIN;
@@ -1974,6 +1975,11 @@ namespace
   std::size_t CSGCGALDomain3D::remove_selfintersections()
   {
     return PolyhedronUtils::remove_self_intersections(impl->p);
+  }
+  //-----------------------------------------------------------------------------
+  void CSGCGALDomain3D::smooth_laplacian(double c)
+  {
+    LaplacianSmoothing::smooth(impl->p, c);
   }
 
   } // end namespace mshr
