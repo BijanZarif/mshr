@@ -126,20 +126,19 @@ Construct_initial_points::operator()(OutputIterator pts, const int n) const
     r_domain_.get_corners(std::back_inserter(corners));
     current_index = corners.size();
     current_index++;
-    // for (const std::pair<int, Point_3>& c : corners)
-    for (typename std::vector<std::pair<int, Point_3> >::iterator it = corners.begin();
-         it != corners.end(); it++)
+    for (const std::pair<int, Point_3>& c : corners)
     {
-      inserted_points.forced_insert_point(it->second);
+      inserted_points.forced_insert_point(c.second);
     }
   }
 
   // Insert n surface points from each disconnected component
-  for (typename std::list<Vertex_const_handle>::iterator it = components.begin();
-       it != components.end(); it++)
+  for (Vertex_const_handle v : components)
   {
-    Vertex_const_handle current = *it;
-    recursive_insert<FuzzyPointMap, Polyhedron>(inserted_points, visited, current, n+inserted_points.size());
+    recursive_insert<FuzzyPointMap, Polyhedron>(inserted_points,
+                                                visited,
+                                                v,
+                                                n+inserted_points.size());
   }
 
   // for (auto it = inserted_points.begin(); it != inserted_points.end(); it++)
