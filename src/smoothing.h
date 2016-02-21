@@ -53,7 +53,12 @@ class LaplacianSmoothing
         h_current++;
       } while (h_current != h_start);
 
-      smoothed.push_back(std::make_pair(Vertex_handle(vit), current + c*delta/vit->vertex_degree()));
+      Point_3 p = current + c*delta/vit->vertex_degree();
+
+      // Evaluate exact value to reduce memory usage
+      p.exact();
+
+      smoothed.push_back(std::make_pair(Vertex_handle(vit), p));
     }
 
     // Apply the smoothing
