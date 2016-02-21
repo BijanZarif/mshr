@@ -41,8 +41,7 @@
 #include <dolfin/mesh/Vertex.h>
 #include <dolfin/mesh/Cell.h>
 
-#include <CGAL/Exact_rational.h>
-#include <CGAL/Cartesian.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #ifndef MSHR_ENABLE_EXPERIMENTAL
   #include <CGAL/Nef_polyhedron_3.h>
@@ -76,7 +75,7 @@ namespace
 {
 
 
-  typedef CGAL::Cartesian<CGAL::Exact_rational>  Exact_Kernel;
+  typedef CGAL::Exact_predicates_exact_constructions_kernel  Exact_Kernel;
   typedef Exact_Kernel::Triangle_3               Exact_Triangle_3;
   typedef Exact_Kernel::Triangle_2               Exact_Triangle_2;
   typedef Exact_Kernel::Vector_3                 Exact_Vector_3;
